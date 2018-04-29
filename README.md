@@ -36,3 +36,11 @@ Some helper JS and CSS files are created to style the Web application.
 10) Invoking the Trained Model for Prediction
 The uploaded image will be classified using the restored pre-trained CNN model. The classification label will finally get rendered on a new HTML page.
 ![2018-04-29_22-30-57](https://user-images.githubusercontent.com/16560492/39411202-98faaedc-4c05-11e8-9f3b-785a06bec1cb.png)
+
+References
+tf.nn module:
+https://www.tensorflow.org/api_docs/python/tf/nn
+CIFAR10 dataset:
+https://www.cs.toronto.edu/~kriz/cifar.html
+
+For more info.: KDnuggets: https://www.kdnuggets.com/author/ahmed-gad LinkedIn: https://www.linkedin.com/in/ahmedfgad Facebook: https://www.facebook.com/ahmed.f.gadd ahmed.f.gad@gmail.com ahmed.fawzy@ci.menofia.edu.eg
