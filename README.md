@@ -68,6 +68,121 @@ def unpickle_patch(file):
 2) <h4>Building the Computational Graph</h4>
 The CNN architecture is created by stacking conv-relu-pool-dropout-fc layers.<br>
 ![graph_large_attrs_key _too_large_attrs limit_attr_size 1024 run 1 - copy](https://user-images.githubusercontent.com/16560492/39411206-ae3add94-4c05-11e8-9444-a7c21d3fa254.png)
+```python
+def create_conv_layer(input_data, filter_size, num_filters):
+    """
+    Builds the CNN convolution (conv) layer.
+    :param input_data:patch data to be processed.
+    :param filter_size:#Number of rows and columns of each filter. It is expected to have a rectangular filter.
+    :param num_filters:Number of filters.
+    :return:The last fully connected layer of the network.
+    """
+    """
+    Preparing the filters of the conv layer by specifiying its shape. 
+    Number of channels in both input image and each filter must match.
+    Because number of channels is specified in the shape of the input image as the last value, index of -1 works fine.
+    """
+    filters = tensorflow.Variable(tensorflow.truncated_normal(shape=(filter_size, filter_size, tensorflow.cast(input_data.shape[-1], dtype=tensorflow.int32), num_filters),
+                                                              stddev=0.05))
+    print("Size of conv filters bank : ", filters.shape)
+
+    """
+    Building the convolution layer by specifying the input data, filters, strides along each of the 4 dimensions, and the padding.
+    Padding value of 'VALID' means the some borders of the input image will be lost in the result based on the filter size.
+    """
+    conv_layer = tensorflow.nn.conv2d(input=input_data,
+                                      filter=filters,
+                                      strides=[1, 1, 1, 1],
+                                      padding="VALID")
+    print("Size of conv result : ", conv_layer.shape)
+    return filters, conv_layer#Returing the filters and the convolution layer result.
+
+def create_CNN(input_data, num_classes, keep_prop):
+    """
+    Builds the CNN architecture by stacking conv, relu, pool, dropout, and fully connected layers.
+    :param input_data:patch data to be processed.
+    :param num_classes:Number of classes in the dataset. It helps determining the number of outputs in the last fully connected layer.
+    :param keep_prop:probability of dropping neurons in the dropout layer.
+    :return: last fully connected layer.
+    """
+    #Preparing the first convolution layer.
+    filters1, conv_layer1 = create_conv_layer(input_data=input_data, filter_size=5, num_filters=4)
+    """
+    Applying ReLU activation function over the conv layer output. 
+    It returns a new array of the same shape as the input array.
+    """
+    relu_layer1 = tensorflow.nn.relu(conv_layer1)
+    print("Size of relu1 result : ", relu_layer1.shape)
+    """
+    Max pooling is applied to the ReLU layer result to achieve translation invariance.
+    It returns a new array of a different shape from the the input array relative to the strides and kernel size used.
+    """
+    max_pooling_layer1 = tensorflow.nn.max_pool(value=relu_layer1,
+                                                ksize=[1, 2, 2, 1],
+                                                strides=[1, 1, 1, 1],
+                                                padding="VALID")
+    print("Size of maxpool1 result : ", max_pooling_layer1.shape)
+
+    #Similar to the previous conv-relu-pool layers, new layers are just stacked to complete the CNN architecture.
+    #Conv layer with 3 filters and each filter is of sisze of 5x5.
+    filters2, conv_layer2 = create_conv_layer(input_data=max_pooling_layer1, filter_size=7, num_filters=3)
+    relu_layer2 = tensorflow.nn.relu(conv_layer2)
+    print("Size of relu2 result : ", relu_layer2.shape)
+    max_pooling_layer2 = tensorflow.nn.max_pool(value=relu_layer2,
+                                                ksize=[1, 2, 2, 1],
+                                                strides=[1, 1, 1, 1],
+                                                padding="VALID")
+    print("Size of maxpool2 result : ", max_pooling_layer2.shape)
+
+    #Conv layer with 2 filters and a filter sisze of 5x5.
+    filters3, conv_layer3 = create_conv_layer(input_data=max_pooling_layer2, filter_size=5, num_filters=2)
+    relu_layer3 = tensorflow.nn.relu(conv_layer3)
+    print("Size of relu3 result : ", relu_layer3.shape)
+    max_pooling_layer3 = tensorflow.nn.max_pool(value=relu_layer3,
+                                                ksize=[1, 2, 2, 1],
+                                                strides=[1, 1, 1, 1],
+                                                padding="VALID")
+    print("Size of maxpool3 result : ", max_pooling_layer3.shape)
+
+    #Adding dropout layer before the fully connected layers to avoid overfitting.
+    flattened_layer = dropout_flatten_layer(previous_layer=max_pooling_layer3, keep_prop=keep_prop)
+
+    #First fully connected (FC) layer. It accepts the result of the dropout layer after being flattened (1D).
+    fc_resultl = fc_layer(flattened_layer=flattened_layer, num_inputs=flattened_layer.get_shape()[1:].num_elements(),
+                          num_outputs=200)
+    #Second fully connected layer accepting the output of the previous fully connected layer. Number of outputs is equal to the number of dataset classes.
+    fc_result2 = fc_layer(flattened_layer=fc_resultl, num_inputs=fc_resultl.get_shape()[1:].num_elements(),
+                          num_outputs=num_classes)
+    print("Fully connected layer results : ", fc_result2)
+    return fc_result2#Returning the result of the last FC layer.
+
+def dropout_flatten_layer(previous_layer, keep_prop):
+    """
+    Applying the dropout layer.
+    :param previous_layer: Result of the previous layer to the dropout layer.
+    :param keep_prop: Probability of keeping neurons.
+    :return: flattened array.
+    """
+    dropout = tensorflow.nn.dropout(x=previous_layer, keep_prob=keep_prop)
+    num_features = dropout.get_shape()[1:].num_elements()
+    layer = tensorflow.reshape(previous_layer, shape=(-1, num_features))#Flattening the results.
+    return layer
+
+def fc_layer(flattened_layer, num_inputs, num_outputs):
+    """
+    uilds a fully connected (FC) layer.
+    :param flattened_layer: Previous layer after being flattened.
+    :param num_inputs: Number of inputs in the previous layer.
+    :param num_outputs: Number of outputs to be returned in such FC layer.
+    :return:
+    """
+    #Preparing the set of weights for the FC layer. It depends on the number of inputs and number of outputs.
+    fc_weights = tensorflow.Variable(tensorflow.truncated_normal(shape=(num_inputs, num_outputs),
+                                                              stddev=0.05))
+    #Matrix multiplication between the flattened array and the set of weights.
+    fc_resultl = tensorflow.matmul(flattened_layer, fc_weights)
+    return fc_resultl#Output of the FC layer (result of matrix multiplication).
+```
 
 3) <h4>Training the CNN</h4>
 Training the CNN based on the prepared training data.
