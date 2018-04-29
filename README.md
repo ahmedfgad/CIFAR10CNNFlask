@@ -186,15 +186,69 @@ def fc_layer(flattened_layer, num_inputs, num_outputs):
 
 3) <h4>Training the CNN</h4>
 Training the CNN based on the prepared training data.
+```python
+num_patches = 1#Number of patches
+for patch_num in numpy.arange(num_patches):
+    print("Patch : ", str(patch_num))
+    percent = 20 #percent of samples to be included in each path.
+    #Getting the input-output data of the current path.
+    shuffled_data, shuffled_labels = get_patch(data=dataset_array, labels=dataset_labels, percent=percent)
+    #Data required for cnn operation. 1)Input Images, 2)Output Labels, and 3)Dropout probability
+    cnn_feed_dict = {data_tensor: shuffled_data,
+                     label_tensor: shuffled_labels,
+                     keep_prop: 0.5}
+    """
+    Training the CNN based on the current patch. 
+    CNN error is used as input in the run to minimize it.
+    SoftMax predictions are returned to compute the classification accuracy.
+    """
+    softmax_predictions_, _ = sess.run([softmax_predictions, error], feed_dict=cnn_feed_dict)
+    #Calculating number of correctly classified samples.
+    correct = numpy.array(numpy.where(softmax_predictions_ == shuffled_labels))
+    correct = correct.size
+    print("Correct predictions/", str(percent * 50000/100), ' : ', correct)
+```
 
 4) <h4>Saving the Trained CNN Model</h4>
 The trained CNN model is saved for later use for predicting unseen samples.
+```python
+#Saving the model after being trained.
+saver = tensorflow.train.Saver()
+save_model_path = "C:\\Users\\Dell\\Desktop\\model\\"
+save_path = saver.save(sess=sess, save_path=save_model_path+"model.ckpt")
+print("Model saved in : ", save_path)
+```
 
 5) <h4>Restoring the Pre-Trained Model</h4>
 Before predicting class label for unseen samples, the saved CNN model must be restored.
+```python
+#Restoring the previously saved trained model.
+saved_model_path = 'C:\\Users\\Dell\\Desktop\\model\\'
+saver = tensorflow.train.import_meta_graph(saved_model_path+'model.ckpt.meta')
+saver.restore(sess=sess, save_path=saved_model_path+'model.ckpt')
+```
 
 6) <h4>Testing the Trained CNN Model</h4>
 New unseen test samples are fed to the model for predicting its labels.
+```python
+softmax_propabilities = graph.get_tensor_by_name(name="softmax_probs:0")
+softmax_predictions = tensorflow.argmax(softmax_propabilities, axis=1)
+data_tensor = graph.get_tensor_by_name(name="data_tensor:0")
+label_tensor = graph.get_tensor_by_name(name="label_tensor:0")
+keep_prop = graph.get_tensor_by_name(name="keep_prop:0")
+
+#keep_prop is equal to 1 because there is no more interest to remove neurons in the testing phase.
+feed_dict_testing = {data_tensor: dataset_array,
+                     label_tensor: dataset_labels,
+                     keep_prop: 1.0}
+#Running the session to predict the outcomes of the testing samples.
+softmax_propabilities_, softmax_predictions_ = sess.run([softmax_propabilities, softmax_predictions],
+                                                      feed_dict=feed_dict_testing)
+#Assessing the model accuracy by counting number of correctly classified samples.
+correct = numpy.array(numpy.where(softmax_predictions_ == dataset_labels))
+correct = correct.size
+print("Correct predictions/10,000 : ", correct)
+```
 
 7) <h4>Building Flask Web Application</h4>
 A Flask Web application is created to enable the remote access of the trained CNN model for classifying images transferred using the HTTP protocol.
