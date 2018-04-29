@@ -263,6 +263,56 @@ Some helper JS and CSS files are created to style the Web application.
 10) <h4>Invoking the Trained Model for Prediction</h4>
 The uploaded image will be classified using the restored pre-trained CNN model. The classification label will finally get rendered on a new HTML page.<br>
 ![2018-04-29_22-30-57](https://user-images.githubusercontent.com/16560492/39411202-98faaedc-4c05-11e8-9f3b-785a06bec1cb.png)
+```python
+def CNN_predict():
+    """
+    Reads the uploaded image file and predicts its label using the saved pre-trained CNN model.
+    :return: Either an error if the image is not for CIFAR10 dataset or redirects the browser to a new page to show the prediction result if no error occurred.
+    """
+    """
+    Setting the previously created 'secure_filename' to global.
+    This is because to be able invoke a global variable created in another function, it must be defined global in the caller function.
+    """
+    global secure_filename
+    #Reading the image file from the path it was saved in previously.
+    img = scipy.misc.imread(os.path.join(app.root_path, secure_filename))
+
+    """
+    Checking whether the image dimensions match the CIFAR10 specifications.
+    CIFAR10 images are RGB (i.e. they have 3 dimensions). It number of dimenions was not equal to 3, then a message will be returned.
+    """
+    if(img.ndim) == 3:
+        """
+        Checking if the number of rows and columns of the read image matched CIFAR10 (32 rows and 32 columns).
+        """
+        if img.shape[0] == img.shape[1] and img.shape[0] == 32:
+            """
+            Checking whether the last dimension of the image has just 3 channels (Red, Green, and Blue).
+            """
+            if img.shape[-1] == 3:
+                """
+                Passing all conditions above, the image is proved to be of CIFAR10.
+                This is why it is passed to the predictor.
+                """
+                predicted_class = CIFAR10_CNN_Predict_Image.main(img)
+                """
+                After predicting the class label of the input image, the prediction label is rendered on an HTML page.
+                The HTML page is fetched from the /templates directory. The HTML page accepts an input which is the predicted class.
+                """
+                return flask.render_template(template_name_or_list="prediction_result.html", predicted_class=predicted_class)
+            else:
+                # If the image dimensions do not match the CIFAR10 specifications, then an HTML page is rendered to show the problem.
+                return flask.render_template(template_name_or_list="error.html", img_shape=img.shape)
+        else:
+            # If the image dimensions do not match the CIFAR10 specifications, then an HTML page is rendered to show the problem.
+            return flask.render_template(template_name_or_list="error.html", img_shape=img.shape)
+    return "An error occurred."#Returned if there is a different error other than wrong image dimensions.
+"""
+Creating a route between the URL (http://localhost:7777/predict) to a viewer function that is called after navigating to such URL. 
+Endpoint 'predict' is used to make the route reusable without hard-coding it later.
+"""
+app.add_url_rule(rule="/predict/", endpoint="predict", view_func=CNN_predict)
+```
 
 <h3>References</h3>
 tf.nn module:<br>
