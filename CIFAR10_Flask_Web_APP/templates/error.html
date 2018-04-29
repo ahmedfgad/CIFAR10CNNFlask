@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link type="text/css" rel="stylesheet" href="{{url_for(endpoint='static', filename='project_styles.css')}}">
+    <meta charset="UTF-8">
+    <title>Error</title>
+</head>
+<body>
+<center>
+    <h1 class="error">Error</h1>
+    <h2 class="error-msg">Read image dimensions {{img_shape}} do not match the CIFAR10 specifications (32x32x3).</h2>
+    <a href="{{url_for(endpoint='homepage')}}"><span>Return to homepage</span>.</a>
+</center>
+</body>
+</html>
