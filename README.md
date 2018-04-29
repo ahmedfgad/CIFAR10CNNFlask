@@ -9,6 +9,7 @@ The training data should be read and prepared for use with the CNN.
 
 2) Building the Computational Graph
 The CNN architecture is created by stacking conv-relu-pool-dropout-fc layers.
+![graph_large_attrs_key _too_large_attrs limit_attr_size 1024 run 1 - copy](https://user-images.githubusercontent.com/16560492/39411206-ae3add94-4c05-11e8-9444-a7c21d3fa254.png)
 
 3) Training the CNN
 Training the CNN based on the prepared training data.
@@ -27,9 +28,11 @@ A Flask Web application is created to enable the remote access of the trained CN
 
 8) Upload an Image via HTML Form
 A HTML page will allow the user to upload a CIFAR10 image to the server. 
+![2018-04-29_22-28-43](https://user-images.githubusercontent.com/16560492/39411196-8b5ea3f0-4c05-11e8-8eae-f9006f8f9b63.png)
 
 9) Using JavaScript and CSS
 Some helper JS and CSS files are created to style the Web application.
 
 10) Invoking the Trained Model for Prediction
 The uploaded image will be classified using the restored pre-trained CNN model. The classification label will finally get rendered on a new HTML page.
+![2018-04-29_22-30-57](https://user-images.githubusercontent.com/16560492/39411202-98faaedc-4c05-11e8-9f3b-785a06bec1cb.png)
