@@ -63,6 +63,7 @@ def unpickle_patch(file):
     patch_bin_file = open(file, 'rb')#Reading the binary file.
     patch_dict = pickle.load(patch_bin_file, encoding='bytes')#Loading the details of the binary file into a dictionary.
     return patch_dict#Returning the dictionary.
+```
 
 2) <h4>Building the Computational Graph</h4>
 The CNN architecture is created by stacking conv-relu-pool-dropout-fc layers.<br>
