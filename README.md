@@ -4,8 +4,7 @@ The following diagram summarizes the project.
 
 The project steps are as follows:
 
-1) Preparing the Training Data
-
+1) </h4>Preparing the Training Data</h4>
 The training data should be read and prepared for use with the CNN.
 ```python
 def get_dataset_images(dataset_path, im_dim=32, num_channels=3):
