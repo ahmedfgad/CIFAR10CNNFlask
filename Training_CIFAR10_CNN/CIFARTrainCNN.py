@@ -258,10 +258,10 @@ sess.run(tensorflow.global_variables_initializer())
 Because it may be impossible to feed the complete data to the CNN on normal machines, it is recommended to split the data into a number of patches.
 A percent of traning samples is used to create each path. Samples for each path can be randomly selected.
 """
-num_patches = 1#Number of patches
+num_patches = 10#Number of patches
 for patch_num in numpy.arange(num_patches):
     print("Patch : ", str(patch_num))
-    percent = 20 #percent of samples to be included in each path.
+    percent = 80 #percent of samples to be included in each path.
     #Getting the input-output data of the current path.
     shuffled_data, shuffled_labels = get_patch(data=dataset_array, labels=dataset_labels, percent=percent)
     #Data required for cnn operation. 1)Input Images, 2)Output Labels, and 3)Dropout probability
