@@ -1,8 +1,16 @@
+"""
+Good and quick.
+Deeper in ML and DL.
+Overfitting.
+Github readme instructions should tell only how to run the code.
+"""
+
 import flask
 import werkzeug
 import os
 import scipy.misc
 import CIFAR10_CNN_Predict_Image#Module for predicting the class label of an input image.
+import tensorflow
 
 #Creating a new Flask Web application. It accepts the package name.
 app = flask.Flask("CIFAR10_Flask_Web_App")
@@ -12,6 +20,10 @@ def CNN_predict():
     Reads the uploaded image file and predicts its label using the saved pre-trained CNN model.
     :return: Either an error if the image is not for CIFAR10 dataset or redirects the browser to a new page to show the prediction result if no error occurred.
     """
+
+    global sess
+    global graph
+
     """
     Setting the previously created 'secure_filename' to global.
     This is because to be able invoke a global variable created in another function, it must be defined global in the caller function.
@@ -37,7 +49,7 @@ def CNN_predict():
                 Passing all conditions above, the image is proved to be of CIFAR10.
                 This is why it is passed to the predictor.
                 """
-                predicted_class = CIFAR10_CNN_Predict_Image.main(img)
+                predicted_class = CIFAR10_CNN_Predict_Image.main(sess, graph, img)
                 """
                 After predicting the class label of the input image, the prediction label is rendered on an HTML page.
                 The HTML page is fetched from the /templates directory. The HTML page accepts an input which is the predicted class.
@@ -77,6 +89,7 @@ def upload_image():
         """
         return flask.redirect(flask.url_for(endpoint="predict"))
     return "Image upload failed."
+
 """
 Creating a route between the URL (http://localhost:7777/upload) to a viewer function that is called after navigating to such URL. 
 Endpoint 'upload' is used to make the route reusable without hard-coding it later.
@@ -98,6 +111,21 @@ Endpoint 'homepage' is used to make the route reusable without hard-coding it la
 """
 app.add_url_rule(rule="/", endpoint="homepage", view_func=redirect_upload)
 
+def prepare_TF_session(saved_model_path):
+    global sess
+    global graph
+
+    sess = tensorflow.Session()
+
+    saver = tensorflow.train.import_meta_graph(saved_model_path+'model.ckpt.meta')
+    saver.restore(sess=sess, save_path=saved_model_path+'model.ckpt')
+
+    #Initalizing the varaibales.
+    sess.run(tensorflow.global_variables_initializer())
+
+    graph = tensorflow.get_default_graph()
+    return graph
+
 """
 To activate the Web server to receive requests, the application must run.
 A good practice is to check whether the file is whether the file called from an external Python file or not.
@@ -110,4 +138,7 @@ if __name__ == "__main__":
     port: 7777
     debug: flag set to True to return debugging information.
     """
+
+    #Restoring the previously saved trained model.
+    prepare_TF_session(saved_model_path='C:\\Users\\Dell\\Desktop\\model\\')
     app.run(host="localhost", port=7777, debug=True)
