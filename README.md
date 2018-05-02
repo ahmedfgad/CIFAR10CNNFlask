@@ -314,6 +314,18 @@ Endpoint 'predict' is used to make the route reusable without hard-coding it lat
 app.add_url_rule(rule="/predict/", endpoint="predict", view_func=CNN_predict)
 ```
 
+*****************************************
+Updates 2-5-2018
+The previous implementation can only be used in development but not in production because server was opening a session for each new request. This wastes the resources to much.
+The modified  code can be used in production mode because the session is opened globally only once to serve all requests. This is efficient than before.
+The way it is done is opening the session while opening the server. Exactly it is done using such code:
+if __name__ == "__main__":
+    #Restoring the previously saved trained model.
+    prepare_TF_session(saved_model_path='C:\\Users\\Dell\\Desktop\\model\\')
+    app.run(host="localhost", port=7777, debug=True)
+Thanks to <a href='https://www.linkedin.com/in/bakrianoo'>abu bakr Soliman</a>
+*****************************************
+
 <h3>References</h3>
 tf.nn module:<br>
 https://www.tensorflow.org/api_docs/python/tf/nn<br>
