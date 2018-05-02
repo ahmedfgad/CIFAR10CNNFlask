@@ -245,7 +245,7 @@ cross_entropy = tensorflow.nn.softmax_cross_entropy_with_logits(logits=tensorflo
 #Summarizing the cross entropy into a single value (cost) to be minimized by the learning algorithm.
 cost = tensorflow.reduce_mean(cross_entropy)
 #Minimizng the network cost using the Gradient Descent optimizer with a learning rate is 0.01.
-error = tensorflow.train.GradientDescentOptimizer(learning_rate=.01).minimize(cost)
+ops = tensorflow.train.GradientDescentOptimizer(learning_rate=.01).minimize(cost)
 
 #Creating a new TensorFlow Session to process the computational graph.
 sess = tensorflow.Session()
@@ -273,7 +273,7 @@ for patch_num in numpy.arange(num_patches):
     CNN error is used as input in the run to minimize it.
     SoftMax predictions are returned to compute the classification accuracy.
     """
-    softmax_predictions_, _ = sess.run([softmax_predictions, error], feed_dict=cnn_feed_dict)
+    softmax_predictions_, _ = sess.run([softmax_predictions, ops], feed_dict=cnn_feed_dict)
     #Calculating number of correctly classified samples.
     correct = numpy.array(numpy.where(softmax_predictions_ == shuffled_labels))
     correct = correct.size
