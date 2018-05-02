@@ -60,3 +60,6 @@ softmax_propabilities_, softmax_predictions_ = sess.run([softmax_propabilities, 
 correct = numpy.array(numpy.where(softmax_predictions_ == dataset_labels))
 correct = correct.size
 print("Correct predictions/10,000 : ", correct)
+
+#Closing the session
+sess.close()
