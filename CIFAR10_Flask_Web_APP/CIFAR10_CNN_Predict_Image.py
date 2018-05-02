@@ -10,9 +10,11 @@ def unpickle_patch(file):
     patch_dict = pickle.load(patch_bin_file, encoding='bytes')
     return patch_dict
 
-def main(img):
+def main(sess, graph, img):
     """
     The 'main' method accepts an input image array of size 32x32x3 and returns its class label.
+    :param sess:TF session created globally.
+    :param graph:TF graph of the trained model.
     :param img:RGB image of size 32x32x3.
     :return:Predicted class label.
     """
@@ -20,18 +22,6 @@ def main(img):
     patches_dir = "C:\\Users\\Dell\\Downloads\\Compressed\\cifar-10-python\\cifar-10-batches-py\\"
     dataset_array = numpy.random.rand(1, 32, 32, 3)
     dataset_array[0, :, :, :] = img
-
-    sess = tensorflow.Session()
-
-    #Restoring the previously saved trained model.
-    saved_model_path = 'C:\\Users\\Dell\\Desktop\\model\\'
-    saver = tensorflow.train.import_meta_graph(saved_model_path+'model.ckpt.meta')
-    saver.restore(sess=sess, save_path=saved_model_path+'model.ckpt')
-
-    #Initalizing the varaibales.
-    sess.run(tensorflow.global_variables_initializer())
-
-    graph = tensorflow.get_default_graph()
 
     """
     Restoring previous created tensors in the training phase based on their given tensor names in the training phase.
