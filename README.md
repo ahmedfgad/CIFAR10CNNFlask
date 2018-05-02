@@ -314,8 +314,8 @@ Endpoint 'predict' is used to make the route reusable without hard-coding it lat
 app.add_url_rule(rule="/predict/", endpoint="predict", view_func=CNN_predict)
 ```
 
-*****************************************
-<h2>Updates 2-5-2018</h2>
+<br>*****************************************<br>
+<h4>Updates 2-5-2018</h4>
 The previous implementation can only be used in development but not in production because server was opening a session for each new request. This wastes the resources to much.<br>
 The modified  code can be used in production mode because the session is opened globally only once to serve all requests. This is efficient than before.<br>
 The way it is done is opening the session while opening the server. Exactly it is done using such code:<br>
@@ -325,7 +325,7 @@ if __name__ == "__main__":
     prepare_TF_session(saved_model_path='C:\\Users\\Dell\\Desktop\\model\\')
     app.run(host="localhost", port=7777, debug=True)
 ```
-Thanks to <a href='https://www.linkedin.com/in/bakrianoo'>abu bakr Soliman</a>
+Thanks to <a href='https://www.linkedin.com/in/bakrianoo'>abu bakr Soliman</a><br>
 *****************************************
 
 <h3>References</h3>
