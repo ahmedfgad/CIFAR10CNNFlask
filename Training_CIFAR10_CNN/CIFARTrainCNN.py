@@ -5,6 +5,12 @@ import matplotlib.pyplot
 import scipy.misc
 import os
 
+"""
+Data Augmentation
+Gradient decent return value
+Closing session
+"""
+
 def get_dataset_images(dataset_path, im_dim=32, num_channels=3):
     """
     This function accepts the dataset path, reads the data, and returns it after being reshaped to match the requierments of the CNN.
@@ -258,7 +264,7 @@ sess.run(tensorflow.global_variables_initializer())
 Because it may be impossible to feed the complete data to the CNN on normal machines, it is recommended to split the data into a number of patches.
 A percent of traning samples is used to create each path. Samples for each path can be randomly selected.
 """
-num_patches = 10#Number of patches
+num_patches = 5#Number of patches
 for patch_num in numpy.arange(num_patches):
     print("Patch : ", str(patch_num))
     percent = 80 #percent of samples to be included in each path.
@@ -279,9 +285,11 @@ for patch_num in numpy.arange(num_patches):
     correct = correct.size
     print("Correct predictions/", str(percent * 50000/100), ' : ', correct)
 
+#Closing the session
+sess.close()
+
 #Saving the model after being trained.
 saver = tensorflow.train.Saver()
 save_model_path = "C:\\Users\\Dell\\Desktop\\model\\"
 save_path = saver.save(sess=sess, save_path=save_model_path+"model.ckpt")
 print("Model saved in : ", save_path)
-
