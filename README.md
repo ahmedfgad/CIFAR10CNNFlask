@@ -328,7 +328,6 @@ if __name__ == "__main__":
     app.run(host="localhost", port=7777, debug=True)
 ```
 
-Thanks to <a href='https://www.linkedin.com/in/bakrianoo'>abu bakr Soliman</a><br>
 *****************************************
 
 <h3>References</h3>
